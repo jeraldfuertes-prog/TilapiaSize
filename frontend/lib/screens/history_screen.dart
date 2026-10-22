@@ -347,7 +347,7 @@ class _EmptyHistory extends StatelessWidget {
             height: 54,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: const Color(0xFFEFF5F2),
+              color: const Color(0xFFEAF8FB),
               borderRadius: BorderRadius.circular(17),
             ),
             child: const Icon(Icons.history_rounded, color: AppColors.primary),

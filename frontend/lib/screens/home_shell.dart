@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/theme/app_theme.dart';
+import '../models/auth_user.dart';
 import '../models/grading_record.dart';
 import '../services/history_service.dart';
 import '../widgets/sidebar.dart';
@@ -11,7 +12,14 @@ import 'history_screen.dart';
 import 'profile_screen.dart';
 
 class HomeShell extends StatefulWidget {
-  const HomeShell({super.key});
+  const HomeShell({
+    super.key,
+    required this.user,
+    required this.onLogout,
+  });
+
+  final AuthUser user;
+  final Future<void> Function() onLogout;
 
   @override
   State<HomeShell> createState() => _HomeShellState();
@@ -65,35 +73,38 @@ class _HomeShellState extends State<HomeShell> {
   }
 
   String get _title => switch (_current) {
-    AppSection.dashboard => 'Dashboard',
-    AppSection.grade => 'Grade Fish',
-    AppSection.history => 'History',
-    AppSection.profile => 'Profile',
-  };
+        AppSection.dashboard => 'Dashboard',
+        AppSection.grade => 'Grade Fish',
+        AppSection.history => 'History',
+        AppSection.profile => 'Profile',
+      };
 
   Widget _buildScreen() => switch (_current) {
-    AppSection.dashboard => DashboardScreen(
-      history: _history,
-      isLoading: _loadingHistory,
-      onNavigate: _select,
-    ),
-    AppSection.grade => GradeScreen(
-      onSaveResult: _addRecord,
-      onNavigate: _select,
-    ),
-    AppSection.history => HistoryScreen(
-      history: _history,
-      onDelete: _deleteRecord,
-      onClear: _clearHistory,
-      onNavigate: _select,
-    ),
-    AppSection.profile => const ProfileScreen(),
-  };
+        AppSection.dashboard => DashboardScreen(
+            history: _history,
+            isLoading: _loadingHistory,
+            onNavigate: _select,
+          ),
+        AppSection.grade => GradeScreen(
+            onSaveResult: _addRecord,
+            onNavigate: _select,
+          ),
+        AppSection.history => HistoryScreen(
+            history: _history,
+            onDelete: _deleteRecord,
+            onClear: _clearHistory,
+            onNavigate: _select,
+          ),
+        AppSection.profile => ProfileScreen(
+            user: widget.user,
+            onLogout: widget.onLogout,
+          ),
+      };
 
   void _showHelp() {
     showDialog<void>(
       context: context,
-      barrierColor: const Color(0x7508231C),
+      barrierColor: const Color(0x76052E39),
       builder: (context) => Dialog(
         insetPadding: const EdgeInsets.all(20),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
@@ -134,7 +145,7 @@ class _HomeShellState extends State<HomeShell> {
                 ),
                 const SizedBox(height: 10),
                 const Text(
-                  'This web application helps users capture or upload tilapia images, analyze fish size using AI, view grading results, and manage saved grading history through a simple and responsive interface.',
+                  'TilapiaSize helps users capture or upload tilapia images, analyze fish size grading results, and manage saved grading history through a responsive aquaculture-focused interface.',
                   style: TextStyle(
                     color: AppColors.muted,
                     fontSize: 13,
@@ -146,13 +157,6 @@ class _HomeShellState extends State<HomeShell> {
                   width: double.infinity,
                   child: FilledButton(
                     onPressed: () => Navigator.pop(context),
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      minimumSize: const Size(0, 44),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
                     child: const Text(
                       'Got it',
                       style: TextStyle(fontWeight: FontWeight.w700),
@@ -179,6 +183,7 @@ class _HomeShellState extends State<HomeShell> {
           children: [
             AppTopBar(
               title: _title,
+              user: widget.user,
               showMenu: mobile,
               onMenu: () => _scaffoldKey.currentState?.openDrawer(),
               onHelp: _showHelp,

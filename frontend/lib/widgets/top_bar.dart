@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
 import '../core/theme/app_theme.dart';
+import '../models/auth_user.dart';
 import 'common.dart';
 
 class AppTopBar extends StatelessWidget {
   const AppTopBar({
     super.key,
     required this.title,
+    required this.user,
     required this.onMenu,
     required this.onHelp,
     required this.onProfile,
@@ -14,6 +16,7 @@ class AppTopBar extends StatelessWidget {
   });
 
   final String title;
+  final AuthUser user;
   final VoidCallback onMenu;
   final VoidCallback onHelp;
   final VoidCallback onProfile;
@@ -43,7 +46,7 @@ class AppTopBar extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (!compact) const Eyebrow('Automated fish size grading'),
+                    if (!compact) const Eyebrow('Aquaculture vision grading'),
                     if (!compact) const SizedBox(height: 2),
                     Text(
                       title,
@@ -75,10 +78,10 @@ class AppTopBar extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      const _Avatar(),
+                      _Avatar(initials: userInitials(user.name)),
                       if (!compact) ...[
                         const SizedBox(width: 9),
-                        const _ProfileCopy(),
+                        _ProfileCopy(user: user),
                       ],
                     ],
                   ),
@@ -115,7 +118,8 @@ class _IconButton extends StatelessWidget {
 }
 
 class _Avatar extends StatelessWidget {
-  const _Avatar();
+  const _Avatar({required this.initials});
+  final String initials;
 
   @override
   Widget build(BuildContext context) {
@@ -127,9 +131,9 @@ class _Avatar extends StatelessWidget {
         color: AppColors.primarySoft,
         borderRadius: BorderRadius.circular(10),
       ),
-      child: const Text(
-        'FA',
-        style: TextStyle(
+      child: Text(
+        initials,
+        style: const TextStyle(
           color: AppColors.primaryDark,
           fontSize: 12,
           fontWeight: FontWeight.w800,
@@ -140,21 +144,23 @@ class _Avatar extends StatelessWidget {
 }
 
 class _ProfileCopy extends StatelessWidget {
-  const _ProfileCopy();
+  const _ProfileCopy({required this.user});
+  final AuthUser user;
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'User',
-          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+          user.name,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
         ),
-        SizedBox(height: 1),
+        const SizedBox(height: 1),
         Text(
-          'Registered user',
-          style: TextStyle(fontSize: 10, color: AppColors.muted),
+          user.role,
+          style: const TextStyle(fontSize: 10, color: AppColors.muted),
         ),
       ],
     );

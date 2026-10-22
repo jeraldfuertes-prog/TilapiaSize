@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const background = Color(0xFFF5F8F6);
+  static const background = Color(0xFFF3FBFD);
   static const surface = Colors.white;
-  static const surfaceSoft = Color(0xFFEEF7F2);
-  static const surfaceBlue = Color(0xFFEDF7FA);
-  static const ink = Color(0xFF153229);
-  static const muted = Color(0xFF6C7F77);
-  static const line = Color(0xFFDCE8E1);
-  static const primary = Color(0xFF0F8064);
-  static const primaryDark = Color(0xFF09654F);
-  static const primarySoft = Color(0xFFDFF2EA);
-  static const accent = Color(0xFF1E9AB3);
-  static const accentSoft = Color(0xFFE3F6FA);
+  static const surfaceSoft = Color(0xFFEAF8FB);
+  static const surfaceBlue = Color(0xFFE6F7FB);
+  static const ink = Color(0xFF0A3542);
+  static const muted = Color(0xFF617E87);
+  static const line = Color(0xFFCFE8EE);
+  static const primary = Color(0xFF0AA7B8);
+  static const primaryDark = Color(0xFF087789);
+  static const primarySoft = Color(0xFFD8F4F7);
+  static const accent = Color(0xFF2D8FE0);
+  static const accentSoft = Color(0xFFE7F3FD);
   static const warning = Color(0xFFF1A63B);
   static const danger = Color(0xFFC65353);
-  static const sidebar = Color(0xFF0D3A31);
+  static const sidebar = Color(0xFF063F50);
 }
 
 class AppTheme {
@@ -27,6 +27,7 @@ class AppTheme {
         seedColor: AppColors.primary,
         brightness: Brightness.light,
         primary: AppColors.primary,
+        secondary: AppColors.accent,
         surface: AppColors.surface,
       ),
       textTheme: base.textTheme.apply(
@@ -50,11 +51,11 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(11),
-          borderSide: const BorderSide(color: AppColors.primary, width: 1.4),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
         ),
       ),
       snackBarTheme: const SnackBarThemeData(
-        backgroundColor: Color(0xFF13382E),
+        backgroundColor: Color(0xFF064A5B),
         contentTextStyle: TextStyle(color: Colors.white, fontSize: 12),
         behavior: SnackBarBehavior.floating,
       ),

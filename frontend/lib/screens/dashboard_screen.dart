@@ -140,11 +140,11 @@ class _HeroCard extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFE8F7EF), Color(0xFFF9FCFA), Color(0xFFE9F8FB)],
+          colors: [Color(0xFFE4F8FB), Color(0xFFF8FCFD), Color(0xFFE8F7FC)],
           stops: [0, .56, 1],
         ),
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: const Color(0xFFD7E9E0)),
+        border: Border.all(color: const Color(0xFFCFE8EE)),
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -159,7 +159,7 @@ class _HeroCard extends StatelessWidget {
                   vertical: 7,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFD9F0E6),
+                  color: const Color(0xFFD8F4F7),
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: const Text(
@@ -243,7 +243,7 @@ class _HeroProof extends StatelessWidget {
                 padding: const EdgeInsets.only(left: 12),
                 decoration: const BoxDecoration(
                   border: Border(
-                    left: BorderSide(color: Color(0xFFC4E1D5), width: 2),
+                    left: BorderSide(color: Color(0xFFBFE5EB), width: 2),
                   ),
                 ),
                 child: Column(
@@ -334,10 +334,10 @@ class _ScanFrameState extends State<_ScanFrame>
           decoration: BoxDecoration(
             color: Colors.white.withValues(alpha: .72),
             borderRadius: BorderRadius.circular(30),
-            border: Border.all(color: const Color(0xFFBCDED2)),
+            border: Border.all(color: const Color(0xFFB6E3EA)),
             boxShadow: const [
               BoxShadow(
-                color: Color(0x1F175443),
+                color: Color(0x1F0A6073),
                 blurRadius: 60,
                 offset: Offset(0, 20),
               ),
@@ -365,13 +365,13 @@ class _ScanFrameState extends State<_ScanFrame>
                       gradient: const LinearGradient(
                         colors: [
                           Colors.transparent,
-                          Color(0xFF1B9A78),
+                          Color(0xFF0AA7B8),
                           Colors.transparent,
                         ],
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF1B9A78).withValues(alpha: .45),
+                          color: const Color(0xFF0AA7B8).withValues(alpha: .45),
                           blurRadius: 14,
                         ),
                       ],
@@ -411,7 +411,7 @@ class _ScanTag extends StatelessWidget {
         borderRadius: BorderRadius.circular(999),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x1412372E),
+            color: Color(0x14063F50),
             blurRadius: 20,
             offset: Offset(0, 8),
           ),
@@ -749,7 +749,7 @@ class _EmptyIcon extends StatelessWidget {
       height: 54,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: const Color(0xFFEFF5F2),
+        color: const Color(0xFFEAF8FB),
         borderRadius: BorderRadius.circular(17),
       ),
       child: Icon(icon, color: AppColors.primary, size: 20),

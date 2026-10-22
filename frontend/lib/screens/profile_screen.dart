@@ -1,49 +1,34 @@
 import 'package:flutter/material.dart';
 
 import '../core/theme/app_theme.dart';
+import '../models/auth_user.dart';
 import '../widgets/common.dart';
 
-class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+class ProfileScreen extends StatelessWidget {
+  const ProfileScreen({
+    super.key,
+    required this.user,
+    required this.onLogout,
+  });
 
-  @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
-}
-
-class _ProfileScreenState extends State<ProfileScreen> {
-  final _nameController = TextEditingController(text: 'User');
-  final _emailController = TextEditingController(text: 'farmer@example.com');
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    super.dispose();
-  }
-
-  void _save() {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Prototype preferences saved locally for this session.',
-          ),
-        ),
-      );
-  }
+  final AuthUser user;
+  final Future<void> Function() onLogout;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const SectionHeading(eyebrow: 'Account', title: 'Profile'),
+        const SectionHeading(
+          eyebrow: 'Account',
+          title: 'Profile',
+          subtitle: 'Your current TilapiaSize account and access role.',
+        ),
         const SizedBox(height: 16),
         LayoutBuilder(
           builder: (context, constraints) {
             final stacked = constraints.maxWidth < 1120;
-            final profile = _buildProfileCard();
+            final profile = _ProfileCard(user: user, onLogout: onLogout);
             const security = _SecurityCard();
             if (stacked) {
               return Column(
@@ -63,32 +48,47 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ],
     );
   }
+}
 
-  Widget _buildProfileCard() {
+class _ProfileCard extends StatelessWidget {
+  const _ProfileCard({
+    required this.user,
+    required this.onLogout,
+  });
+
+  final AuthUser user;
+  final Future<void> Function() onLogout;
+
+  @override
+  Widget build(BuildContext context) {
     return AppPanel(
       padding: const EdgeInsets.all(22),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Row(
+          Row(
             children: [
-              _LargeAvatar(),
-              SizedBox(width: 14),
+              _LargeAvatar(initials: userInitials(user.name)),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'User',
-                      style: TextStyle(
+                      user.name,
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
-                      'Registered TilapiaSize user',
-                      style: TextStyle(color: AppColors.muted, fontSize: 12),
+                      user.role,
+                      style: const TextStyle(
+                        color: AppColors.primaryDark,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ],
                 ),
@@ -96,61 +96,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ],
           ),
           const Divider(height: 40, color: AppColors.line),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final oneColumn = constraints.maxWidth < 600;
-              final fields = [
-                _LabeledField(
-                  label: 'Display name',
-                  child: TextField(controller: _nameController),
-                ),
-                _LabeledField(
-                  label: 'Email',
-                  child: TextField(
-                    controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-                ),
-                const _LabeledField(
-                  label: 'Role',
-                  child: TextField(
-                    enabled: false,
-                    decoration: InputDecoration(hintText: 'User'),
-                  ),
-                ),
-                const _LabeledField(
-                  label: 'Preferred result unit',
-                  child: _UnitDropdown(),
-                ),
-              ];
-              if (oneColumn) {
-                return Column(
-                  children: [
-                    for (var i = 0; i < fields.length; i++) ...[
-                      fields[i],
-                      if (i != fields.length - 1) const SizedBox(height: 14),
-                    ],
-                  ],
-                );
-              }
-              return Wrap(
-                spacing: 14,
-                runSpacing: 14,
-                children: fields
-                    .map(
-                      (field) => SizedBox(
-                        width: (constraints.maxWidth - 14) / 2,
-                        child: field,
-                      ),
-                    )
-                    .toList(),
-              );
-            },
+          _InfoRow(label: 'Email', value: user.email),
+          const SizedBox(height: 14),
+          _InfoRow(label: 'Role', value: user.role),
+          const SizedBox(height: 14),
+          const _InfoRow(
+            label: 'Preferred result unit',
+            value: 'Centimeters (cm)',
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 20),
           Align(
             alignment: Alignment.centerLeft,
-            child: PrimaryButton(label: 'Save preferences', onPressed: _save),
+            child: OutlinedButton.icon(
+              onPressed: onLogout,
+              icon: const Icon(Icons.logout_rounded),
+              label: const Text('Sign out'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.danger,
+                side: const BorderSide(color: Color(0xFFE7BFC1)),
+              ),
+            ),
           ),
         ],
       ),
@@ -159,7 +124,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 }
 
 class _LargeAvatar extends StatelessWidget {
-  const _LargeAvatar();
+  const _LargeAvatar({required this.initials});
+  final String initials;
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -170,9 +137,9 @@ class _LargeAvatar extends StatelessWidget {
         color: AppColors.primarySoft,
         borderRadius: BorderRadius.circular(18),
       ),
-      child: const Text(
-        'FA',
-        style: TextStyle(
+      child: Text(
+        initials,
+        style: const TextStyle(
           color: AppColors.primaryDark,
           fontSize: 20,
           fontWeight: FontWeight.w800,
@@ -182,47 +149,41 @@ class _LargeAvatar extends StatelessWidget {
   }
 }
 
-class _LabeledField extends StatelessWidget {
-  const _LabeledField({required this.label, required this.child});
+class _InfoRow extends StatelessWidget {
+  const _InfoRow({required this.label, required this.value});
   final String label;
-  final Widget child;
+  final String value;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(color: AppColors.muted, fontSize: 11),
-        ),
-        const SizedBox(height: 6),
-        child,
-      ],
-    );
-  }
-}
-
-class _UnitDropdown extends StatefulWidget {
-  const _UnitDropdown();
-
-  @override
-  State<_UnitDropdown> createState() => _UnitDropdownState();
-}
-
-class _UnitDropdownState extends State<_UnitDropdown> {
-  String value = 'Centimeters (cm)';
-  @override
-  Widget build(BuildContext context) {
-    return DropdownButtonFormField<String>(
-      initialValue: value,
-      items: const [
-        DropdownMenuItem(
-          value: 'Centimeters (cm)',
-          child: Text('Centimeters (cm)'),
-        ),
-      ],
-      onChanged: (next) => setState(() => value = next ?? value),
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceSoft,
+        borderRadius: BorderRadius.circular(13),
+        border: Border.all(color: AppColors.line),
+      ),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 150,
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: AppColors.muted,
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(fontWeight: FontWeight.w700),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -233,11 +194,10 @@ class _SecurityCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const items = [
-      'Validate image format and file size for usability.',
-      'Store only safe client state.',
-      'Send authenticated HTTPS requests.',
-      'Never store database credentials or raw SQL.',
-      'Server remains responsible for final authorization and validation.',
+      'Flutter handles the user interface and local session prototype.',
+      'FastAPI will own final authentication, authorization, and validation.',
+      'PostgreSQL credentials must never be stored in the Flutter client.',
+      'Production requests should use HTTPS and JWT-based authorization.',
     ];
     return AppPanel(
       padding: const EdgeInsets.all(22),
@@ -247,7 +207,7 @@ class _SecurityCard extends StatelessWidget {
           const Eyebrow('Security boundary'),
           const SizedBox(height: 4),
           const Text(
-            'Client-side responsibilities',
+            'Account security',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
           ),
           const SizedBox(height: 14),

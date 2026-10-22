@@ -57,7 +57,7 @@ class AppSidebar extends StatelessWidget {
                         Text(
                           'Aquaculture AI',
                           style: TextStyle(
-                            color: Color(0xFFB9D4CB),
+                            color: Color(0xFFBDECF2),
                             fontSize: 12,
                           ),
                         ),
@@ -107,7 +107,7 @@ class AppSidebar extends StatelessWidget {
                   const Text(
                     'Capture one tilapia at a time in good lighting and keep the full fish visible.',
                     style: TextStyle(
-                      color: Color(0xFFC9DDD6),
+                      color: Color(0xFFC8EEF3),
                       fontSize: 13,
                       height: 1.55,
                     ),
@@ -117,7 +117,7 @@ class AppSidebar extends StatelessWidget {
                     onPressed: () => onSelect(AppSection.grade),
                     style: TextButton.styleFrom(
                       padding: EdgeInsets.zero,
-                      foregroundColor: const Color(0xFF9CE1C9),
+                      foregroundColor: const Color(0xFF8BE4EC),
                     ),
                     child: const Text(
                       'Start grading →',
@@ -166,7 +166,7 @@ class _NavItem extends StatelessWidget {
             decoration: BoxDecoration(
               border: active
                   ? const Border(
-                      left: BorderSide(color: Color(0xFF80D6B9), width: 3),
+                      left: BorderSide(color: Color(0xFF51D3DE), width: 3),
                     )
                   : null,
               borderRadius: BorderRadius.circular(12),
@@ -178,7 +178,7 @@ class _NavItem extends StatelessWidget {
                   width: 24,
                   child: Icon(
                     icon,
-                    color: active ? Colors.white : const Color(0xFFC8DDD6),
+                    color: active ? Colors.white : const Color(0xFFC8EEF3),
                     size: 20,
                   ),
                 ),
@@ -186,7 +186,7 @@ class _NavItem extends StatelessWidget {
                 Text(
                   label,
                   style: TextStyle(
-                    color: active ? Colors.white : const Color(0xFFC8DDD6),
+                    color: active ? Colors.white : const Color(0xFFC8EEF3),
                     fontWeight: FontWeight.w600,
                   ),
                 ),

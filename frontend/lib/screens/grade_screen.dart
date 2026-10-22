@@ -210,7 +210,7 @@ class _GradeScreenState extends State<GradeScreen> {
           Container(
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
-              color: const Color(0xFFEEF4F1),
+              color: const Color(0xFFEAF8FB),
               borderRadius: BorderRadius.circular(13),
             ),
             child: Row(
@@ -241,10 +241,10 @@ class _GradeScreenState extends State<GradeScreen> {
                 constraints: const BoxConstraints(minHeight: 300),
                 padding: const EdgeInsets.all(28),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF7FBF9),
+                  color: const Color(0xFFF4FBFD),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: const Color(0xFFAACBBE),
+                    color: const Color(0xFF9FD7E0),
                     width: 1.5,
                   ),
                 ),
@@ -280,7 +280,7 @@ class _GradeScreenState extends State<GradeScreen> {
                 Container(
                   constraints: const BoxConstraints(minHeight: 300),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF0E1F1A),
+                    color: const Color(0xFF052F3B),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: const Center(
@@ -292,7 +292,7 @@ class _GradeScreenState extends State<GradeScreen> {
                         Text(
                           'Camera capture',
                           style: TextStyle(
-                            color: Color(0xFFDCE9E4),
+                            color: Color(0xFFDDF5F8),
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -303,7 +303,7 @@ class _GradeScreenState extends State<GradeScreen> {
                             'Open your device camera to capture a fish image.',
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              color: Color(0xFF97AAA3),
+                              color: Color(0xFF8EADB5),
                               fontSize: 12,
                             ),
                           ),
@@ -336,7 +336,7 @@ class _GradeScreenState extends State<GradeScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFFF4F8F6),
+              color: const Color(0xFFF0F9FB),
               borderRadius: BorderRadius.circular(13),
             ),
             child: const Row(
@@ -466,7 +466,7 @@ class _InfoDot extends StatelessWidget {
       height: 22,
       alignment: Alignment.center,
       decoration: const BoxDecoration(
-        color: Color(0xFFDBECE4),
+        color: Color(0xFFD8F4F7),
         shape: BoxShape.circle,
       ),
       child: const Text(
@@ -567,12 +567,12 @@ class _IdleAnalysis extends StatelessWidget {
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [AppColors.primary, Color(0xFF27A7A5)],
+                  colors: [AppColors.primary, Color(0xFF2D8FE0)],
                 ),
                 borderRadius: BorderRadius.circular(26),
                 boxShadow: const [
                   BoxShadow(
-                    color: Color(0x330F8064),
+                    color: Color(0x330AA7B8),
                     blurRadius: 36,
                     offset: Offset(0, 16),
                   ),
@@ -629,7 +629,7 @@ class _LoadingAnalysis extends StatelessWidget {
               height: 60,
               child: CircularProgressIndicator(
                 color: AppColors.primary,
-                backgroundColor: Color(0xFFDCEFE7),
+                backgroundColor: Color(0xFFD8F4F7),
                 strokeWidth: 5,
               ),
             ),
