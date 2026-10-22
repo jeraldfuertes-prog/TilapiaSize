@@ -273,8 +273,8 @@ class _AuthScreenState extends State<AuthScreen> {
                 ),
               ),
               validator: (value) {
-                if ((value ?? '').length < 6) {
-                  return 'Use at least 6 characters.';
+                if ((value ?? '').length < 8) {
+                  return 'Use at least 8 characters.';
                 }
                 return null;
               },
@@ -354,7 +354,7 @@ class _AuthScreenState extends State<AuthScreen> {
             ),
             const SizedBox(height: 14),
             const Text(
-              'Prototype login is stored locally on this device. It will be replaced by FastAPI/JWT authentication.',
+              'Authentication is handled by the TilapiaSize FastAPI backend using PostgreSQL and JWT.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: AppColors.muted,

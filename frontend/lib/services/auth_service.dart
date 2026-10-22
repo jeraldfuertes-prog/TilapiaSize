@@ -1,7 +1,9 @@
 import 'dart:convert';
 
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../core/config/api_config.dart';
 import '../models/auth_user.dart';
 
 class AuthException implements Exception {
@@ -13,40 +15,54 @@ class AuthException implements Exception {
 }
 
 class AuthService {
-  static const _accountsKey = 'tilapiasize-local-accounts-v1';
-  static const _sessionKey = 'tilapiasize-session-email-v1';
-
-  String _normalizeEmail(String email) => email.trim().toLowerCase();
-
-  Future<List<Map<String, dynamic>>> _loadAccounts() async {
-    final prefs = await SharedPreferences.getInstance();
-    final raw = prefs.getString(_accountsKey);
-    if (raw == null || raw.isEmpty) return [];
-
-    try {
-      final decoded = jsonDecode(raw) as List<dynamic>;
-      return decoded
-          .map((item) => Map<String, dynamic>.from(item as Map))
-          .toList();
-    } catch (_) {
-      return [];
-    }
-  }
+  static const _tokenKey = 'tilapiasize-access-token-v1';
+  static const _userKey = 'tilapiasize-auth-user-v1';
 
   Future<AuthUser?> currentUser() async {
     final prefs = await SharedPreferences.getInstance();
-    final sessionEmail = prefs.getString(_sessionKey);
-    if (sessionEmail == null || sessionEmail.isEmpty) return null;
+    final token = prefs.getString(_tokenKey);
+    if (token == null || token.isEmpty) return null;
 
-    final accounts = await _loadAccounts();
-    for (final account in accounts) {
-      if (account['email'] == sessionEmail) {
-        return AuthUser.fromJson(account);
+    AuthUser? cachedUser;
+    final rawUser = prefs.getString(_userKey);
+    if (rawUser != null && rawUser.isNotEmpty) {
+      try {
+        cachedUser = AuthUser.fromJson(
+          Map<String, dynamic>.from(jsonDecode(rawUser) as Map),
+        );
+      } catch (_) {
+        cachedUser = null;
       }
     }
 
-    await prefs.remove(_sessionKey);
-    return null;
+    try {
+      final response = await http
+          .get(
+            Uri.parse('${ApiConfig.baseUrl}/auth/me'),
+            headers: {
+              'Accept': 'application/json',
+              'Authorization': 'Bearer $token',
+            },
+          )
+          .timeout(const Duration(seconds: 8));
+
+      if (response.statusCode == 200) {
+        final user = AuthUser.fromJson(
+          Map<String, dynamic>.from(jsonDecode(response.body) as Map),
+        );
+        await prefs.setString(_userKey, jsonEncode(user.toJson()));
+        return user;
+      }
+
+      if (response.statusCode == 401) {
+        await logout();
+        return null;
+      }
+    } catch (_) {
+      return cachedUser;
+    }
+
+    return cachedUser;
   }
 
   Future<AuthUser> register({
@@ -54,64 +70,104 @@ class AuthService {
     required String email,
     required String role,
     required String password,
-  }) async {
-    final trimmedName = name.trim();
-    final normalizedEmail = _normalizeEmail(email);
-
-    if (trimmedName.length < 2) {
-      throw const AuthException('Please enter your full name.');
-    }
-    if (!normalizedEmail.contains('@') || !normalizedEmail.contains('.')) {
-      throw const AuthException('Please enter a valid email address.');
-    }
-    if (password.length < 6) {
-      throw const AuthException('Password must be at least 6 characters.');
-    }
-
-    final accounts = await _loadAccounts();
-    if (accounts.any((account) => account['email'] == normalizedEmail)) {
-      throw const AuthException('An account with this email already exists.');
-    }
-
-    final user = AuthUser(
-      name: trimmedName,
-      email: normalizedEmail,
-      role: role,
+  }) {
+    return _authenticate(
+      path: '/auth/register',
+      body: {
+        'name': name.trim(),
+        'email': email.trim().toLowerCase(),
+        'role': role,
+        'password': password,
+      },
+      successCodes: const {201},
     );
-
-    // Prototype only: replace this local credential store with FastAPI/JWT auth.
-    accounts.add({
-      ...user.toJson(),
-      'password': password,
-    });
-
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_accountsKey, jsonEncode(accounts));
-    await prefs.setString(_sessionKey, normalizedEmail);
-    return user;
   }
 
   Future<AuthUser> login({
     required String email,
     required String password,
-  }) async {
-    final normalizedEmail = _normalizeEmail(email);
-    final accounts = await _loadAccounts();
+  }) {
+    return _authenticate(
+      path: '/auth/login',
+      body: {
+        'email': email.trim().toLowerCase(),
+        'password': password,
+      },
+      successCodes: const {200},
+    );
+  }
 
-    for (final account in accounts) {
-      if (account['email'] == normalizedEmail &&
-          account['password'] == password) {
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString(_sessionKey, normalizedEmail);
-        return AuthUser.fromJson(account);
+  Future<AuthUser> _authenticate({
+    required String path,
+    required Map<String, dynamic> body,
+    required Set<int> successCodes,
+  }) async {
+    try {
+      final response = await http
+          .post(
+            Uri.parse('${ApiConfig.baseUrl}$path'),
+            headers: const {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: jsonEncode(body),
+          )
+          .timeout(const Duration(seconds: 12));
+
+      final decoded = response.body.isEmpty
+          ? <String, dynamic>{}
+          : Map<String, dynamic>.from(jsonDecode(response.body) as Map);
+
+      if (!successCodes.contains(response.statusCode)) {
+        throw AuthException(_errorMessage(decoded, response.statusCode));
+      }
+
+      final token = decoded['access_token'] as String?;
+      final userMap = decoded['user'];
+      if (token == null || userMap is! Map) {
+        throw const AuthException('The server returned an invalid response.');
+      }
+
+      final user = AuthUser.fromJson(
+        Map<String, dynamic>.from(userMap),
+      );
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_tokenKey, token);
+      await prefs.setString(_userKey, jsonEncode(user.toJson()));
+      return user;
+    } on AuthException {
+      rethrow;
+    } on FormatException {
+      throw const AuthException('The server returned an invalid response.');
+    } catch (_) {
+      throw AuthException(
+        'Cannot reach the TilapiaSize API at ${ApiConfig.baseUrl}. '
+        'Make sure FastAPI is running.',
+      );
+    }
+  }
+
+  String _errorMessage(Map<String, dynamic> body, int statusCode) {
+    final detail = body['detail'];
+    if (detail is String && detail.isNotEmpty) return detail;
+    if (detail is List && detail.isNotEmpty) {
+      final first = detail.first;
+      if (first is Map && first['msg'] is String) {
+        return first['msg'] as String;
       }
     }
+    return 'Authentication failed (HTTP $statusCode).';
+  }
 
-    throw const AuthException('Incorrect email or password.');
+  Future<String?> accessToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_tokenKey);
   }
 
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_sessionKey);
+    await prefs.remove(_tokenKey);
+    await prefs.remove(_userKey);
   }
 }
