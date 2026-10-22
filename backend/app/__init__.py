@@ -1,0 +1,1 @@
+"""TilapiaSize FastAPI application package."""
